@@ -1,2 +1,15 @@
 ---
-# defaults file for clevis
+clevis_packages:
+  - clevis
+  - clevis-luks
+  - clevis-dracut
+domain_name: omb.ibcs
+tang1: "fac-srv-01.{{ domain_name }}"
+tang2: "fac-srv-02.{{ domain_name }}"
+file: /proc/sys/crypto/fips_enabled
+grub: /boot/grub2/grub.cfg
+fips_delay: 60
+bootfs: /boot
+bootuuid:
+fips_packages:
+  - dracut-fips

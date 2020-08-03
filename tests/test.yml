@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: clevis
+  become: yes
   roles:
-    - clevis
+    - /home/charles/Documents/RH/ibcs/ansible_roles/clevis

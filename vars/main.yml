@@ -1,2 +1,21 @@
 ---
-# vars file for clevis
+# this allows us to insert a name=value into a line of the format:
+# key="name1=value1 name2=value2 nameN=valueN"
+regexp_quoted_params: ^({{ re_qp_key }})({{ re_qp_other_params }})({{
+        re_qp_param }}?)({{ re_qp_other_params }})({{ re_qp_key_end }})
+replace_quoted_params: \1\2{{ re_qp_insert | ternary('', ' ') }}{{ param }}={{
+        value }}{{ re_qp_insert | ternary(' ', '') }}\4\5
+
+# none of these regexes create capture groups
+re_qp_key: (?:\s*{{ key }}=")
+re_qp_param: (?:{{ re_qp_insert | ternary('', ' ?') }}{{
+        re_qp_param_start }}{{ param }}=.*?{{
+        re_qp_param_end }}{{ re_qp_insert | ternary(' ?', '') }})
+re_qp_other_params: (?:(?!{{ re_qp_param }}.*).)*{{
+        re_qp_insert | ternary('?', '') }}
+re_qp_param_start: (?<=[" ])
+re_qp_param_end: (?=[" ])
+re_qp_key_end: (?:" *)
+
+# insert the parameter at the beginning or append to the end, default append
+re_qp_insert: "{{ insert | default(not (append | default(true))) }}"

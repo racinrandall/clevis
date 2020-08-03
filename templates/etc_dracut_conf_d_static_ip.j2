@@ -1,0 +1,3 @@
+kernel_cmdline="ip={{ ansible_default_ipv4.address }}::{{ ansible_default_ipv4.gateway }}:{{ ansible_default_ipv4.netmask }}:{{ ansible_fqdn }}:{{ ansible_default_ipv4.interface }}:none:{{ ansible_dns.nameservers[0] }}:{{ ansible_dns.nameserver[1] }}
+omit_dracutmodules+="ifcfg"
+#kernel_cmdline="vlan={{ vlan }}:{{ ansible_default_ipv4.interface }} ip={{ ansible_default_ipv4.address }}::{{ ansible_default_ipv4.gateway }}:{{ ansible_default_ipv4.netmask }}:{{ ansible_fqdn }}:{{ ansible_default_ipv4.interface }}:none:{{ ansible_dns.nameservers[0] }}:{{ ansible_dns.nameserver[1] }}

@@ -1,2 +1,6 @@
 ---
-# handlers file for clevis
+- name: make grub2 config
+  command: /sbin/grub2-mkconfig --output={{ grub }}
+
+- name: rebuild initramfs
+  command: dracut -f
