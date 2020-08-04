@@ -13,3 +13,4 @@ bootfs: /boot
 bootuuid:
 fips_packages:
   - dracut-fips
+fips_enabled: true
