@@ -79,23 +79,18 @@
 #      default_grub_missing_audit is not changed
 #  notify: make grub2 config
 
-- name: Set Fact for Luks UUIDs
-  set_fact:
-    luks_uuid: "rd.luks.uuid={{ item }}"
-  loop: "{{ ansible_proc_cmdline['rd.luks.uuid']}}"
+#- name: Set Fact for Luks UUIDs
+#  set_fact:
+#    luks_uuid: "rd.luks.uuid={{ item }}"
+#  loop: "{{ ansible_proc_cmdline['rd.luks.uuid']}}"
 
-- name: Show Luks_UUID
-  debug:
-    msg: "rd.luks.uuid=[{{ ' rd.luks.uuid='.join(ansible_proc_cmdline['rd.luks.uuid']) }}]"
+#- name: Show Luks_UUID
+#  debug:
+#    msg: "rd.luks.uuid=[{{ ' rd.luks.uuid='.join(ansible_proc_cmdline['rd.luks.uuid']) }}]"
 
-- name: Replace any existing rd.luks.uuid with rd.luks.uuid from actual system in grubcmdline
+- name: Replace any existing rd.luks.uuid and rd.lvm.lv in grubcmdline
   replace:
     path: /etc/default/grub
-    regexp: ^GRUB_CMDLINE_LINUX=(.*?)(rd\.luks\.uuid[^\s]+\s)+(.*)$
-    replace: GRUB_CMDLINE_LINUX=\1rd.luks.uuid={{ ' rd.luks.uuid='.join(ansible_proc_cmdline['rd.luks.uuid']) }}\3
-
-- name: Replace any rd.lvm.lv with specifics from system
-  replace:
-    path: /etc/default/grub
-    regexp: ^GRUB_CMDLINE_LINUX=(.*?)(rd\.lvm\.lv[^\s]+\s)+(.*)$
-    replace: GRUB_CMDLINE_LINUX=\1rd.lvm.lv={{ ' rd.lvm.lv='.join(ansible_proc_cmdline['rd.lvm.lv']) }}\3
+    regexp: ^GRUB_CMDLINE_LINUX=(.*?)rd\.luks\.uuid.*rd\.lvm\.lv[^\s]*(.*)
+    replace: GRUB_CMDLINE_LINUX=\1rd.luks.uuid={{ ' rd.luks.uuid='.join(ansible_proc_cmdline['rd.luks.uuid']) }}rd.lvm.lv={{ ' rd.lvm.lv='.join(ansible_proc_cmdline['rd.lvm.lv']) }}\2
+    backup: true
