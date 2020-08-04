@@ -34,63 +34,13 @@
       set_fact:
         grub: /boot/efi/EFI/redhat/grub.cfg
   when: EFI.stat.exists
-
-- name: Check for GRUB_CMDLINE_LINUX in /etc/default/grub
-  command: grep -P '^\s*GRUB_CMDLINE_LINUX=".*"$' /etc/default/grub
-  check_mode: no
-  failed_when: no
-  changed_when: default_grub_missing_audit.rc > 0
-  register: default_grub_missing_audit
-
-- name: parse sane GRUB_CMDLINE_LINUX from /proc/cmdline
-  command: grep -oP ' ro \K.*?(?= ?LANG=)' /proc/cmdline
-  check_mode: no
-  changed_when: no
-  failed_when: grub_cmdline_linux_audit.rc > 1
-  when: default_grub_missing_audit is changed
-  register: grub_cmdline_linux_audit
-
+  
 - name: Copy over a sane /etc/default/grub
   template:
     src: etc_default_grub.j2
-    dest: /etc/default/grub
+    dest: /etc/default/grub_test
     owner: root
     group: root
     mode: 0644
-  vars:
-    grub_cmdline_linux: "{{ grub_cmdline_linux_audit.stdout }}"
-  when: default_grub_missing_audit is changed
+  
 
-# Modify this to use a dictionary that pulls in the luks uuid and lvms to insert into grub cmdline
-
-#- name: rd.luks.uuid must be in /etc/default/grub
-#  replace:
-#    path: /etc/default/grub
-#    regexp: "{{ regexp_quoted_params }}"
-#    replace: "{{ replace_quoted_params }}"
-#  vars:
-#    key: GRUB_CMDLINE_LINUX
-#    param: rd.luks.uuid
-#    value: "{{ item }}"
-#    append: yes  # this is the default
-#  loop: "{{ ansible_proc_cmdline['rd.luks.uuid'] }}"
-#  when:
-#    - not ansible_check_mode or
-#      default_grub_missing_audit is not changed
-#  notify: make grub2 config
-
-#- name: Set Fact for Luks UUIDs
-#  set_fact:
-#    luks_uuid: "rd.luks.uuid={{ item }}"
-#  loop: "{{ ansible_proc_cmdline['rd.luks.uuid']}}"
-
-#- name: Show Luks_UUID
-#  debug:
-#    msg: "rd.luks.uuid=[{{ ' rd.luks.uuid='.join(ansible_proc_cmdline['rd.luks.uuid']) }}]"
-
-- name: Replace any existing rd.luks.uuid and rd.lvm.lv in grubcmdline
-  replace:
-    path: /etc/default/grub
-    regexp: ^GRUB_CMDLINE_LINUX=(.*?)rd\.luks\.uuid.*rd\.lvm\.lv[^\s]*(.*)
-    replace: GRUB_CMDLINE_LINUX=\1rd.luks.uuid={{ ' rd.luks.uuid='.join(ansible_proc_cmdline['rd.luks.uuid']) }}rd.lvm.lv={{ ' rd.lvm.lv='.join(ansible_proc_cmdline['rd.lvm.lv']) }}\2
-    backup: true

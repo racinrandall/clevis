@@ -3,7 +3,7 @@ GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
 GRUB_DEFAULT=saved
 GRUB_DISABLE_SUBMENU=true
 GRUB_TERMINAL_OUTPUT="console"
-GRUB_CMDLINE_LINUX="{{ grub_cmdline_linux }}"
+GRUB_CMDLINE_LINUX="{% if ansible_proc_cmdline.spectre_v2 %}spectre_v2={{ ansible_proc_cmdline.spectre_v2 }}{% endif %} {% if ansible_proc_cmdline['rd.luks.uuid'] %} {% for luks in ansible_proc_cmdline['rd.luks.uuid'] %}} rd.luks.uuid={{ ansible_proc_cmdline['rd.luks.uuid']}}
 {#{% for param, value in ansible_cmdline.iteritems()
 %}{% if param not in blacklist %} {{ param }}{% if value is string %}={{ value }}{%
 endif %}{% endif %}{% endfor %}"#}
